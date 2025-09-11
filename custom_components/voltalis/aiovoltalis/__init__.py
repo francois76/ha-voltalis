@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+from time import sleep
 from typing import Any
 
 from aiohttp.client import ClientSession, ClientTimeout
@@ -168,9 +169,11 @@ class Voltalis:
             method=CONST.HTTPMethod.GET,
         )
         for diagnostic in diagnostics_json:
-            self._appliances[diagnostic["csApplianceId"]].isReachable = diagnostic["status"] == "OK"
+            self._appliances[diagnostic["csApplianceId"]
+                             ].isReachable = diagnostic["status"] == "OK"
             if diagnostic["status"] == "NOK":
-                _LOGGER.warning(f"Voltalis appliance '{self._appliances[diagnostic["csApplianceId"]].name}' with id {diagnostic["csApplianceId"]} not reachable.\n {diagnostic}")
+                _LOGGER.warning(
+                    f"Voltalis appliance '{self._appliances[diagnostic["csApplianceId"]].name}' with id {diagnostic["csApplianceId"]} not reachable.\n {diagnostic}")
 
     async def async_update_appliance(self, appliance_id: int) -> None:
         """Get a Voltalis appliance."""
@@ -196,7 +199,8 @@ class Voltalis:
 
     async def async_update_user_program(self, program_id: int) -> None:
         """Get Voltalis user programs and update the data model."""
-        _LOGGER.debug(f"Update Voltalis user defined heater programs {program_id}")
+        _LOGGER.debug(
+            f"Update Voltalis user defined heater programs {program_id}")
         program_json = await self.async_send_request(
             f"{CONST.PROGRAMMING_PROGRAMS_URL}/{program_id}",
             retry=False,
@@ -211,7 +215,7 @@ class Voltalis:
     ) -> None:
         """Set Voltalis appliance manual settings."""
         _LOGGER.debug(f"Set Voltalis appliance programming {programming_id} ")
-        _LOGGER.debug(f"json = {kwargs.get('json','empty')}")
+        _LOGGER.debug(f"json = {kwargs.get('json', 'empty')}")
 
         await self.async_send_request(
             f"{CONST.MANUAL_SETTING_URL}/{programming_id}",
@@ -227,10 +231,16 @@ class Voltalis:
     ) -> None:
         """Set Voltalis default program state."""
         _LOGGER.debug(f"Set Voltalis default program state for {program_id}")
-        _LOGGER.debug(f"json = {kwargs.get('json','empty')}")
+        _LOGGER.debug(f"json = {kwargs.get('json', 'empty')}")
 
         await self.async_send_request(
             f"{CONST.QUICK_SETTINGS_URL}/{program_id}/enable",
+            retry=False,
+            method=CONST.HTTPMethod.PUT,
+            **kwargs,
+        )
+        await self.async_send_request(
+            f"{CONST.QUICK_SETTINGS_URL}/{program_id}",
             retry=False,
             method=CONST.HTTPMethod.PUT,
             **kwargs,
@@ -243,7 +253,7 @@ class Voltalis:
     ) -> None:
         """Set Voltalis user program state."""
         _LOGGER.debug(f"Set Voltalis user program state for {program_id}")
-        _LOGGER.debug(f"json = {kwargs.get('json','empty')}")
+        _LOGGER.debug(f"json = {kwargs.get('json', 'empty')}")
 
         await self.async_send_request(
             f"{CONST.PROGRAMMING_PROGRAMS_URL}/{program_id}",
@@ -273,7 +283,8 @@ class Voltalis:
 
         # Replace url placeholder
         if url.rfind("__site__") > 0:
-            url = url.replace("__site__", str(self.cache(CONST.DEFAULT_SITE_ID)))
+            url = url.replace("__site__", str(
+                self.cache(CONST.DEFAULT_SITE_ID)))
 
         _LOGGER.debug("Call Voltalise API")
 

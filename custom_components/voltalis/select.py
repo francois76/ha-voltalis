@@ -37,9 +37,18 @@ class VoltalisPresetSelect(CoordinatorEntity, SelectEntity):
 
     @property
     def current_option(self):
-        # Retourne le nom du program activé, sinon "aucun préreglage"
+        # Priorité : DEFAULT puis USER
         enabled_program = next(
-            (p for p in self.controller.programs if p.isEnabled), None)
+            (p for p in self.controller.programs if p.isEnabled and getattr(
+                p, '_program_type', None) == ProgramType.DEFAULT),
+            None
+        )
+        if not enabled_program:
+            enabled_program = next(
+                (p for p in self.controller.programs if p.isEnabled and getattr(
+                    p, '_program_type', None) == ProgramType.USER),
+                None
+            )
         if enabled_program:
             return enabled_program.name
         return self._none_option
@@ -72,10 +81,8 @@ class VoltalisPresetSelect(CoordinatorEntity, SelectEntity):
             program = self._programs_by_name.get(option)
             _LOGGER.debug("Programme trouvé: %s", program)
             if program:
-                curjson = {
-                    "enabled": True,
-                    "name": program.name,
-                }
+                curjson = program.get_json().copy()
+                curjson["enabled"] = True
 
                 if program._program_type == ProgramType.USER:
                     await program.api.async_set_user_program_state(
@@ -83,6 +90,9 @@ class VoltalisPresetSelect(CoordinatorEntity, SelectEntity):
                         program_id=program.id
                     )
                 else:
+                    curjson["untilFurtherNotice"] = True
+                    curjson["modeEndDate"] = None
+                    _LOGGER.debug(curjson)
                     await program.api.async_set_default_program_state(
                         json=curjson,
                         program_id=program.id

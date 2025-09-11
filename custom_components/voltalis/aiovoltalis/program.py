@@ -3,7 +3,7 @@ from __future__ import annotations
 from enum import Enum
 
 import logging
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from .models import VoltalisProgramDict
 
@@ -12,10 +12,12 @@ if TYPE_CHECKING:
 
 _LOGGER = logging.getLogger(__name__)
 
+
 class ProgramType(Enum):
     """Enum to differentiate Default and User heater programs."""
     DEFAULT = "DEFAULT"
     USER = "USER"
+
 
 class VoltalisProgram:
     """Class to represent each Voltalis program."""
@@ -59,7 +61,6 @@ class VoltalisProgram:
         """Get Voltalis api."""
         return self._voltalis
 
-    def get_json(self) -> []:
+    def get_json(self) -> Any:
         """Get program json"""
         return self._program_json
-
