@@ -1,0 +1,29 @@
+set_global_preset:
+  name: Définir un preset global
+  description: Applique un preset Voltalis avec une durée ou jusqu'à nouvel ordre.
+  fields:
+    preset:
+      name: Mode
+      description: Le preset à appliquer (ECO, CONFORT, HORS_GEL, etc.).
+      required: true
+      example: ECO
+      selector:
+        select:
+          options:
+            - ECO
+            - CONFORT
+            - HORS_GEL
+            - TEMPERATURE
+            - NORMAL
+    duration:
+      name: Durée (heures)
+      description: Durée du preset en heures (si absent → jusqu'à nouvel ordre).
+      required: false
+      example: 4
+      selector:
+        select:
+          options:
+            - 1
+            - 2
+            - 12
+            - 24

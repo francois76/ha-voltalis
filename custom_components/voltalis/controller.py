@@ -100,6 +100,7 @@ class VoltalisController:
 
         """Register devices with the device registry for all Appliances."""
         for appliance in self.appliances:
+            _LOGGER.debug("Registering device %s", appliance.name)
             device_registry.async_get_or_create(
                 config_entry_id=entry.entry_id,
                 identifiers={(DOMAIN, str(appliance.id))},
@@ -109,10 +110,11 @@ class VoltalisController:
             )
 
         """Register devices with the device registry for all Programs."""
-        for program in self.programs:
-            device_registry.async_get_or_create(
-                config_entry_id=entry.entry_id,
-                identifiers={(DOMAIN, str(program.id))},
-                name=program.name.capitalize(),
-                entry_type=dr.DeviceEntryType.SERVICE
-            )
+        # for program in self.programs:
+        #     _LOGGER.debug("Registering program %s", program.name)
+        #     device_registry.async_get_or_create(
+        #         config_entry_id=entry.entry_id,
+        #         identifiers={(DOMAIN, str(program.id))},
+        #         name=program.name.capitalize(),
+        #         entry_type=dr.DeviceEntryType.SERVICE
+        #     )
