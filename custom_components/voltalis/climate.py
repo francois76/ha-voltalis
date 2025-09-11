@@ -73,7 +73,11 @@ class VoltalisClimate(VoltalisEntity, ClimateEntity):
     @property
     def hvac_action(self) -> HVACAction | None:
         """Return the current running hvac operation."""
-        if self.appliance.programming.isOn:
+        if self.appliance.programming.isOn and self.appliance.programming.mode in ["ECO", "HORS_GEL"]:
+            _LOGGER.debug("HVAC Action COOLING")
+            return HVACAction.COOLING
+        elif self.appliance.programming.isOn:
+            _LOGGER.debug("HVAC Action HEATING")
             return HVACAction.HEATING
         return HVACAction.OFF
 
